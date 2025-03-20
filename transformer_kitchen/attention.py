@@ -16,12 +16,14 @@ class Attention:
             values (batch_size, seq_len, d_value): The value tensor.
         """
         _, seq_len, d_key = queries.size()
-
         scores = torch.einsum("bik,bjk->bij", queries, keys)
         scores *= 1 / (d_key ** 0.5)
 
         if self.config.masking == "causal":
             mask = (torch.arange(seq_len).unsqueeze(0) <= torch.arange(seq_len).unsqueeze(1))
+            scores = torch.where(mask, scores, float("-inf") * torch.ones_like(scores))
+        elif self.config.masking == "strict-causal":
+            mask = (torch.arange(seq_len).unsqueeze(0) < torch.arange(seq_len).unsqueeze(1))
             scores = torch.where(mask, scores, float("-inf") * torch.ones_like(scores))
 
         if self.config.temperature != 0.:

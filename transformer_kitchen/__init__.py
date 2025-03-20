@@ -1,2 +1,2 @@
 from .attention import Attention
-from .config import SHAT, AHAT, LUHAT, RUHAT
+from .config import AttentionConfig, Config, SHAT, AHAT, LUHAT, RUHAT
